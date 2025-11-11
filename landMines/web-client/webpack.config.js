@@ -1,7 +1,7 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import CopyWebpackPlugin from 'copy-webpack-plugin'
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -19,7 +19,6 @@ export default {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
-      
     ],
   },
   plugins: [
@@ -27,6 +26,7 @@ export default {
       patterns: [
         { from: 'extLibs', to: 'extLibs' }, // Copia toda la carpeta
         { from: 'index.html', to: '.' }, // Copia el HTML raíz
+        { from: 'index.css', to: '.' }, // Copia el HTML raíz
       ],
     }),
   ],

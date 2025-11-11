@@ -1,36 +1,25 @@
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.TargetDataLine;
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.Util;
 
 public class Capturer {
 
     public static void main(String[] args)throws Exception {
-        AudioFormat format =  new AudioFormat(44100, 16, 1, true, true);
+        Communicator communicator = Util.initialize();
 
-        DataLine.Info infoSpeaker = new DataLine.Info(SourceDataLine.class, format);
-        SourceDataLine speaker = (SourceDataLine)AudioSystem.getLine(infoSpeaker);
+        ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Server", "ws -h localhost -p 9099");
 
-        DataLine.Info infoMic = new DataLine.Info(TargetDataLine.class, format);
-        TargetDataLine mic = (TargetDataLine)AudioSystem.getLine(infoMic);
+        SubjectImpl impl = new SubjectImpl();
 
+        Sender sender = new Sender(impl);
+        sender.init();
+        sender.start();
 
-        mic.open();
-        speaker.open();
+        adapter.add(impl, Util.stringToIdentity("Subject"));
 
-        mic.start();
-        speaker.start();
+        adapter.activate();
 
-        byte[] buffer = new byte[1024];
-
-        while (true) {
-            int resp = mic.read(buffer, 0, buffer.length);
-            if(resp > 0){
-                speaker.write(buffer, 0, resp);
-            }
-        }
-
+        communicator.waitForShutdown();
 
         
     }
